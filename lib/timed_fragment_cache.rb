@@ -46,15 +46,13 @@ module ActionController
     # in the template, as 'when_fragment_expired' will expire the fragment for you.
     module TimedFragment
     
-      def cache_erb_fragment(block, name = {}, options = nil, expiry = nil)
+      def cache_erb_fragment(block, buffer, name = {}, options = nil, expiry = nil)
         unless perform_caching then block.call; return end
 
         fragment = get_fragment(name)
         if expiry && !fragment
           expire_and_write_meta(name, expiry)  
         end
-
-        buffer = eval("_erbout", block.binding)
 
         if fragment
           buffer.concat(fragment)
@@ -120,7 +118,7 @@ module ActionView
       end    
     
       def cache_with_expiry(name = {}, expires = nil, &block)
-        @controller.cache_erb_fragment(block, name, nil, expires)
+        @controller.cache_erb_fragment(block, output_buffer, name, nil, expires)
       end
     
     end
